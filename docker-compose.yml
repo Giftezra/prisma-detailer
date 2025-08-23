@@ -1,0 +1,63 @@
+services:
+  detailer_server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: prisma_detailer_server
+    ports:
+      - "8001:8000"
+    volumes:
+      - ./server/prisma:/app
+    environment:
+      - DEBUG=True
+      - DJANGO_SETTINGS_MODULE=prisma.settings
+      - DJANGO_ALLOWED_HOSTS=*
+    networks:
+      - prisma_shared_net
+
+  detailer_app:
+    build:
+      context: ./prisma_detailer
+      dockerfile: Dockerfile
+    container_name: prisma_detailer
+    ports:
+      - "19003:19000"
+      - "19004:19001"
+      - "19005:19002"
+    volumes:
+      - ./prisma_detailer:/app
+      - /app/node_modules
+    environment:
+      - EXPO_PUBLIC_API_URL=http://detailer_server:8000
+      - EXPO_DEVTOOLS_ENABLED=true
+      - EXPO_DEVTOOLS_LISTEN_ADDRESS=0.0.0.0
+    networks:
+      - prisma_shared_net
+
+  detailer_celery_worker:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    command: celery -A prisma.celery worker --loglevel=info
+    volumes:
+      - ./server/prisma:/app
+    environment:
+      - DJANGO_SETTINGS_MODULE=prisma.settings
+      - CELERY_BROKER_URL=redis://prisma_redis:6379/0
+      - REDIS_HOST=prisma_redis
+      - CELERY_RESULT_BACKEND=redis://prisma_redis:6379/0
+      - CELERY_WORKER_CONCURRENCY=3
+    depends_on:
+      - detailer_server
+    networks:
+      - prisma_shared_net
+
+      
+volumes:
+  redis_data:
+
+
+networks:
+  prisma_shared_net:
+    external: true
+  
