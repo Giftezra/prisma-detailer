@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import User, Detailer, ServiceType, TimeSlot, Job, Earning, BankAccount, Review, TrainingRecord
+from .models import User, Detailer, ServiceType, TimeSlot, Job, Earning, BankAccount, Review, TrainingRecord, Availability
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework.exceptions import ValidationError
 from .utils import get_full_media_url
@@ -33,6 +33,11 @@ class JobSerializer(serializers.ModelSerializer):
 class EarningSerializer(serializers.ModelSerializer):
     class Meta:
         model = Earning
+        fields = '__all__'
+
+class AvailabilitySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Availability
         fields = '__all__'
 
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):

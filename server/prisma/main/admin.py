@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django import forms
-from .models import ServiceType, Job, Earning, BankAccount, Review, TrainingRecord, Detailer, User, TimeSlot
+from .models import ServiceType, Job, Earning, BankAccount, Review, TrainingRecord, Detailer, User, TimeSlot, Availability
 
 # Custom form for ServiceType to handle description as textarea
 class ServiceTypeForm(forms.ModelForm):
@@ -90,3 +90,9 @@ class TimeSlotAdmin(admin.ModelAdmin):
     list_display = ('detailer', 'date', 'start_time', 'end_time', 'is_available', 'is_booked')
     search_fields = ('detailer__user__first_name', 'detailer__user__last_name')
     list_filter = ('date', 'is_available', 'is_booked')
+
+@admin.register(Availability)
+class AvailabilityAdmin(admin.ModelAdmin):
+    list_display = ('detailer', 'date', 'start_time', 'end_time', 'is_available')
+    search_fields = ('detailer__user__first_name', 'detailer__user__last_name')
+    list_filter = ('date', 'is_available')

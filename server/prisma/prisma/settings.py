@@ -4,9 +4,9 @@ import os
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-*juw1_4pf2q30w%l3^o4zys*c49ktp$w11&d!v+@6rw&*zn*js'
-BASE_URL = 'https://65ece2e2d189.ngrok-free.app/detailer'
-ALLOWED_HOSTS = ['https://65ece2e2d189.ngrok-free.app/detailer']
-CSRF_TRUSTED_ORIGINS = ['https://65ece2e2d189.ngrok-free.app/detailer']
+BASE_URL = 'https://8d8231131287.ngrok-free.app'
+ALLOWED_HOSTS = ['https://8d8231131287.ngrok-free.app']
+CSRF_TRUSTED_ORIGINS = ['https://8d8231131287.ngrok-free.app']
 
 DEBUG = True
 
@@ -86,6 +86,17 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
+
+
+# REST Framework Configuration
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ],
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',
+    ],
+}
 
 
 # Internationalization
@@ -189,7 +200,7 @@ REST_FRAMEWORK = {
         'rest_framework.parsers.MultiPartParser',
     ),
 }
-STATIC_URL = 'detailer/static/'
+STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 STATICFILES_DIRS = [
     BASE_DIR / 'static',

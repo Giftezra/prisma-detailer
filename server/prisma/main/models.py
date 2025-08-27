@@ -72,7 +72,6 @@ class Detailer(models.Model):
     longitude = models.FloatField(blank=True, null=True)
     is_active = models.BooleanField(default=True)
     is_verified = models.BooleanField(default=False)
-    is_deleted = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -142,7 +141,7 @@ class Job(models.Model):
     
     service_type = models.ForeignKey(ServiceType, on_delete=models.CASCADE)
 
-    booking_reference = models.UUIDField()
+    booking_reference = models.CharField(max_length=120, unique=True)
     client_name = models.CharField(max_length=120)
     client_phone = models.CharField(max_length=15)
 
@@ -159,6 +158,10 @@ class Job(models.Model):
     country = models.CharField(max_length=55)
     latitude = models.FloatField(blank=True, null=True)
     longitude = models.FloatField(blank=True, null=True)
+
+    addon1 = models.CharField(max_length=120, blank=True, null=True)
+    addon2 = models.CharField(max_length=120, blank=True, null=True)
+    addon3 = models.CharField(max_length=120, blank=True, null=True)
 
     appointment_date = models.DateTimeField()
     appointment_time = models.TimeField()
@@ -177,6 +180,15 @@ class Job(models.Model):
         indexes = [
             models.Index(fields=['detailer', 'status', 'appointment_date', 'appointment_time', 'booking_reference']),
         ]
+
+    # Create an earning record for every completed job
+    def create_earning(self):
+        if self.status == "completed":
+            Earning.objects.create(
+                detailer=self.detailer,
+                job=self,
+                gross_amount=self.service_type.price,
+            )
     
     def __str__(self):
         return f'Job {self.id} - {self.detailer.user.get_full_name()}'
@@ -242,6 +254,8 @@ class BankAccount(models.Model):
     iban = models.CharField(max_length=55)
     bic = models.CharField(max_length=55)
     sort_code = models.CharField(max_length=55)
+    is_primary = models.BooleanField(default=False)
+    is_verified = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -257,6 +271,15 @@ class Review(models.Model):
 
     def __str__(self):
         return f'Review for {self.detailer.user.get_full_name()} - Job {self.job.id}'
+    
+
+class Availability(models.Model):
+    detailer = models.ForeignKey(Detailer, on_delete=models.CASCADE, related_name="availability")
+    date = models.DateField()
+    start_time = models.TimeField()
+    end_time = models.TimeField()
+    is_available = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
 
 
 # -------------------------------
